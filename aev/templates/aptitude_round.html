@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aptitude Round</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        .selection {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: transform 0.3s;
+            width: 45%;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+        }
+
+        .section {
+            display: none;
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        h2 {
+            color: #333;
+            font-size: 22px;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 5px;
+            display: inline-block;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-top: 10px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        input {
+            padding: 10px;
+            width: 100px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .options {
+            list-style: none;
+            padding: 0;
+        }
+
+        .options li {
+            padding: 12px;
+            background: #f1f1f1;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .options li:hover {
+            background: #d4edda;
+        }
+
+        .feedback {
+            font-size: 18px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Aptitude Round</h1>
+    
+    <div class="container">
+        <div class="selection">
+            <div class="card" onclick="showSection('softskills')">
+                <h2>Soft Skills</h2>
+                <p>Learn about essential soft skills in the IT industry.</p>
+            </div>
+            <div class="card" onclick="showSection('logical')">
+                <h2>Logical Reasoning</h2>
+                <p>Test your logical thinking skills with puzzles.</p>
+            </div>
+            <div class="card" onclick="showSection('math')">
+                <h2>Quantitative (Math)</h2>
+                <p>Practice complex math problems for assessments.</p>
+            </div>
+            <div class="card" onclick="showSection('verbal')">
+                <h2>Verbal Reasoning</h2>
+                <p>Improve your verbal reasoning skills with practice.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="container section" id="softskills">
+        <h2>Soft Skills</h2>
+        <p id="softskills-question">Click to get a soft skill tip.</p>
+        <button onclick="fetchSoftSkills()">Get Soft Skills Tip</button>
+        <button onclick="goBack()">Back</button>
+    </div>
+
+    <div class="container section" id="logical">
+        <h2>Logical Reasoning</h2>
+        <p id="logical-question">Click to get a logical question.</p>
+        <ul id="logical-options" class="options"></ul>
+        <button onclick="fetchLogical()">Get Logical Question</button>
+        <button onclick="goBack()">Back</button>
+    </div>
+
+    <div class="container section" id="math">
+        <h2>Quantitative (Math)</h2>
+        <p id="math-question">Click to get a math question.</p>
+        <input type="number" id="math-answer" placeholder="Your answer">
+        <button onclick="checkMathAnswer()">Submit Answer</button>
+        <p id="math-feedback" class="feedback"></p>
+        <button onclick="fetchMath()">Get Math Question</button>
+        <button onclick="goBack()">Back</button>
+    </div>
+
+    <div class="container section" id="verbal">
+        <h2>Verbal Reasoning</h2>
+        <p id="verbal-question">Click to get a verbal reasoning question.</p>
+        <ul id="verbal-options" class="options"></ul>
+        <button onclick="fetchVerbal()">Get Verbal Question</button>
+        <button onclick="goBack()">Back</button>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            document.querySelector(".selection").style.display = "none";
+            document.getElementById(sectionId).style.display = "block";
+        }
+
+        function goBack() {
+            document.querySelectorAll(".section").forEach(section => section.style.display = "none");
+            document.querySelector(".selection").style.display = "flex";
+        }
+
+        function fetchSoftSkills() {
+            const skills = ["Communication", "Teamwork", "Adaptability", "Problem-Solving", "Time Management"];
+            document.getElementById("softskills-question").innerText = skills[Math.floor(Math.random() * skills.length)];
+        }
+
+        function fetchLogical() {
+            fetch("https://opentdb.com/api.php?amount=1&category=9&type=multiple")
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById("logical-question").innerText = data.results[0].question;
+                    let optionsList = document.getElementById("logical-options");
+                    optionsList.innerHTML = "";
+                    [...data.results[0].incorrect_answers, data.results[0].correct_answer].forEach(option => {
+                        let li = document.createElement("li");
+                        li.innerText = option;
+                        optionsList.appendChild(li);
+                    });
+                });
+        }
+
+        function fetchMath() {
+            document.getElementById("math-question").innerText = "Solve: 5x - 2 = 18";
+            window.currentMathAnswer = 4;
+        }
+
+        function checkMathAnswer() {
+            let userAnswer = parseFloat(document.getElementById("math-answer").value);
+            document.getElementById("math-feedback").innerText = userAnswer === window.currentMathAnswer ? "✅ Correct!" : "❌ Wrong!";
+        }
+
+        function fetchVerbal() {
+            fetch("https://opentdb.com/api.php?amount=1&category=10&type=multiple")
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById("verbal-question").innerText = data.results[0].question;
+                });
+        }
+    </script>
+</body>
+</html>
